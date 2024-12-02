@@ -11,7 +11,7 @@ def main():
  \____/_|  \__,_|\__,_|\___| \_| |_/\___\__,_|\__,_|\___|_| |_| |_|\__, |  \__,_|_| |_|_.__/
                                                                     __/ |
                                                                    |___/  by Laith & Adel """)
-    valeur = input("Tu veux une interfaces graphique ? (Yes/No)")
+    valeur = input("Tu veux une interfaces graphique ? (Yes/No) \n")
     if valeur == "Yes" or valeur == "Y" or valeur == "y" or valeur == "yes":
         return Accept()
     return Refuse()
@@ -32,10 +32,20 @@ def Accept(): # Affichage d'une fenetre
     app.mainloop()
 
 def Refuse():
-    reponce = input("Que voulez vous avoir ?").split(": ")
+    reponce = Reponce() # On demande a l'utilisateur de saisir les données et on appel la fonction Reponce()
     taux_reussite = pa.read_csv("./fr-en-indicateurs-valeur-ajoutee-colleges.csv", delimiter=";") # On attribue les données des resultat par etablisement a une variable
     localisation_etablisement = pa.read_csv("./ips-all-geoloc.csv", delimiter=";") # On attribue les données des localisation des etablisement a une variable
-    resultat = taux_reussite[taux_reussite[reponce[0]] == reponce[1]] # On cherche les données
+    for i in range(0,len(reponce),2):
+        print(taux_reussite)
     print(reponce)
-    print(resultat)
+
+def Reponce():
+    request = input("Que voulez vous savoir ? (Exemple: UAI: 0382426F, Département: AIN) \n")
+    pairs = request.split(", ")  # On separe les paires
+    result = []
+    for pair in pairs:
+        key_value = pair.split(": ")  # On separe les cles et les valeurs
+        result.extend(key_value)  # On ajoute les cles et les valeurs à la liste
+    print(result)
+    return result
 print(main())
