@@ -1,4 +1,5 @@
 import customtkinter as ct
+import pandas as pa
 
 def main():
     print(r"""
@@ -31,5 +32,10 @@ def Accept(): # Affichage d'une fenetre
     app.mainloop()
 
 def Refuse():
-    ...
+    reponce = input("Que voulez vous avoir ?").split(": ")
+    taux_reussite = pa.read_csv("./fr-en-indicateurs-valeur-ajoutee-colleges.csv", delimiter=";") # On attribue les données des resultat par etablisement a une variable
+    localisation_etablisement = pa.read_csv("./ips-all-geoloc.csv", delimiter=";") # On attribue les données des localisation des etablisement a une variable
+    resultat = taux_reussite[taux_reussite[reponce[0]] == reponce[1]] # On cherche les données
+    print(reponce)
+    print(resultat)
 print(main())
