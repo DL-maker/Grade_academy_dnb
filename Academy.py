@@ -17,31 +17,22 @@ def main():
  \____/_|  \__,_|\__,_|\___| \_| |_/\___\__,_|\__,_|\___|_| |_| |_|\__, |  \__,_|_| |_|_.__/
                                                                     __/ |
                                                                    |___/  by Laith & Adel """)
-    valeur = input("Tu veux une interfaces graphique ? (Yes/No)")
-    if valeur == "Yes" or valeur == "Y" or valeur == "y" or valeur == "yes":
-        return Accept()
-    return Refuse()
+    parser = argparse.ArgumentParser(description="Academy") # On crée un parser pour les arguments
+    parser.add_argument( "--no-gui", help="Voulez vous une interfqce grqphique ?", action="store_true") # On ajoute un argument pour le fichier CSV
+    args = parser.parse_args() # On parse les arguments
+    if args.no_gui: # Si l'argument est present on lance le mode CLI
+        return cli() 
+    return main_gui()
 
-def button_callback(): # Fonction de test
-    print("button clicked")
 
-def Accept(): # Affichage d'une fenetre
-    app = ct.CTk()
-    app.geometry("500x400")
-
-    textbox = ct.CTkTextbox(app, width=400, height=200)
-    textbox.pack(pady=20)
-
-    button = ct.CTkButton(app, text="my button", command=button_callback) # Quand on click elle appel la fonction button_callback()
-    button.pack(padx=20, pady=20)
-
-    app.mainloop()
-
-def Refuse():
+def cli():
     reponce = input("Que voulez vous avoir ?").split(": ")
-    taux_reussite = pa.read_csv("./fr-en-indicateurs-valeur-ajoutee-colleges.csv", delimiter=";") # On attribue les données des resultat par etablisement a une variable
-    localisation_etablisement = pa.read_csv("./ips-all-geoloc.csv", delimiter=";") # On attribue les données des localisation des etablisement a une variable
+    taux_reussite = pd.read_csv("./fr-en-indicateurs-valeur-ajoutee-colleges.csv", delimiter=";") # On attribue les données des resultat par etablisement a une variable
+    localisation_etablisement = pd.read_csv("./ips-all-geoloc.csv", delimiter=";") # On attribue les données des localisation des etablisement a une variable
     resultat = taux_reussite[taux_reussite[reponce[0]] == reponce[1]] # On cherche les données
     print(reponce)
     print(resultat)
-print(main())
+
+
+if __name__ == "__main__":
+    main()
