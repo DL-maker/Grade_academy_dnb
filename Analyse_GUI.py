@@ -12,7 +12,7 @@ class DataAnalysisGUI:
     def __init__(self, master):
         self.master = master
         master.title("Analyseur de Données CSV")
-        master.geometry("6000x400")
+        master.geometry("600x400")
         
         # Style
         self.style = ttk.Style()
@@ -66,10 +66,24 @@ class DataAnalysisGUI:
         btn_analyser = ttk.Button(main_frame, text="Lancer l'Analyse", command=self.lancer_analyse)
         btn_analyser.pack(pady=10)
 
+        
+
+        # Frame pour les requêtes SQL
+        sql_frame = ttk.Frame(main_frame)
+        sql_frame.pack(fill=tk.X, padx=10, pady=10)
+
+        ttk.Label(sql_frame, text="Requête SQL :").pack(side=tk.LEFT)
+        self.entry_requete_sql = ttk.Entry(sql_frame, width=60)
+        self.entry_requete_sql.pack(side=tk.LEFT, padx=10, expand=True, fill=tk.X)
+
+        btn_executer_sql = ttk.Button(sql_frame, text="Exécuter SQL", command=self.executer_requete_sql)
+        btn_executer_sql.pack(side=tk.LEFT)
+
+
         # Notebook pour les résultats
         self.notebook = ttk.Notebook(main_frame)
         self.notebook.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
-
+        
     def choisir_repertoire(self):
         """Ouvre un dialogue pour choisir le répertoire"""
         repertoire_choisi = filedialog.askdirectory()
@@ -110,7 +124,40 @@ class DataAnalysisGUI:
             self.logger.error(f"Erreur de chargement des données : {e}")
             return None
 
-    
+    def executer_requete_sql(self):
+        """Exécute une requête SQL et affiche les résultats"""
+        if not self.connection_base:
+            messagebox.showwarning("Attention", "Aucune base de données chargée.")
+            return
+
+        requete_sql = self.entry_requete_sql.get().strip()
+        if not requete_sql:
+            messagebox.showwarning("Attention", "Veuillez saisir une requête SQL.")
+            return
+
+        try:
+            # Créer un nouvel onglet pour les résultats SQL
+            frame_sql = ttk.Frame(self.notebook)
+            self.notebook.add(frame_sql, text="Résultats SQL")
+
+            # Zone de texte scrollable pour les résultats
+            resultats_text = scrolledtext.ScrolledText(frame_sql, wrap=tk.WORD)
+            resultats_text.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+            # Exécuter la requête
+            df_resultat = pd.read_sql_query(requete_sql, self.connection_base)
+            
+            # Afficher les résultats
+            resultats_text.insert(tk.END, str(df_resultat))
+            
+            # Sélectionner le nouvel onglet
+            self.notebook.select(frame_sql)
+
+            self.logger.info(f"Requête SQL exécutée : {requete_sql}")
+
+        except Exception as e:
+            messagebox.showerror("Erreur SQL", str(e))
+            self.logger.error(f"Erreur lors de l'exécution de la requête SQL : {e}")
 
     def generer_visualisations(self, dataframes):
         """Génère des visualisations pour les dataframes chargés"""
