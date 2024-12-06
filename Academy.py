@@ -26,50 +26,32 @@ def main():
 
 
 def cli():
-    Columns = {}
-    taux_reussite = pd.read_csv("./fr-en-indicateurs-valeur-ajoutee-colleges.csv", delimiter=";") # On attribue les données des resultat par etablisement a une variable
-    localisation_etablisement = pd.read_csv("./ips-all-geoloc.csv", delimiter=";") # On attribue les données des localisation des etablisement a une variable
-    taux_reussite_2008 = pd.read_csv("./fr-en-dnb-par-etablissement.csv", delimiter=";") # On attribue les données des resultat par etablisement a une variable pour 2008 
-    # On ajoute les colonnes des données dans un dictionnaire
-    Columns['taux_reussite'] = list(taux_reussite.colonnes)
-    Columns['localisation_etablisement'] = list(localisation_etablisement.colonnes)
-    Columns['taux_reussite_2008'] = list(taux_reussite_2008.colonnes)
 
+    Columns = {}
+    taux_reussite = pd.read_csv("./fr-en-indicateurs-valeur-ajoutee-colleges.csv", delimiter=";")
+    localisation_etablisement = pd.read_csv("./ips-all-geoloc.csv", delimiter=";")
+    taux_reussite_2008 = pd.read_csv("./fr-en-dnb-par-etablissement.csv", delimiter=";")
+        
+    # Récupération de l'input utilisateur
     reponce = input("Que voulez vous avoir ? \n").split(": ")
 
-    if not reponce or len(reponce) < 2:  # On check si l'utilisateur a bien entré les arguments
+    # Vérification de l'input
+    if not reponce or len(reponce) < 2:
         print("Veuillez entrer un argument valide sous la forme 'colonne: valeur'")
         return
-    
-    titre_colums = [] # On crée une liste pour check dans quelle colonne est demande
+            
+    # Recherche des colonnes et affichage
+    colonnes_trouvees = rechercher_colonne(reponce)
+    print("Colonnes trouvées:", colonnes_trouvees)
+    print("Arguments reçus:", reponce)
 
-    if reponce[0] in Columns['taux_reussite']:
-        titre_colums.append(taux_reussite)
-    if reponce[0] in Columns['localisation_etablisement']:
-        titre_colums.append(localisation_etablisement)
-    if reponce[0] in Columns['taux_reussite_2008']:
-        titre_colums.append(taux_reussite_2008)
-    if not titre_colums:
-        print("Colonne non trouvée")
-        return
-    
-    if len(reponce[0]) + len(reponce[1]) < 5: # On check si l'utilisateur a bien entré les arguments
-        print("Veuillez entrer un argument valide sous la forme 'colonne: valeur'")
-        return
-    
-    if reponce[0] not in taux_reussite.colonnes: # On check si la colonne n'est pas dans le fichier
-        print(f"Colonne '{reponce[0]}' non trouvée") # Si oui on affiche un message d'erreur
-        return
-    
-    meme_colonnes = set(Columns['taux_reussite']).intersection(Columns['localisation_etablisement'], Columns['taux_reussite_2008']) # On check les colonnes communes
-    print(f"Colonnes equivalent: {meme_colonnes}") # On affiche les colonnes communes
-    resultat = []
 
-    for df in titre_colums:
-        envoie = df[list(meme_colonnes)] # On crée un envoie avec les colonnes communes pour chaque dataframe dans titre_colums
-        resultat.append(envoie) # On ajoute le envoie a la liste resultat
-    resultat = pd.concat(resultat) # On conscate les resultats
-    print(resultat) # On affiche les resultats (affiche que des index :'(  )
+def rechercher_colonne(valeurs):
+        colonnes = []
+        for i in range(0, len(valeurs), 2):
+            if i < len(valeurs):
+                colonnes.append(valeurs[i])
+        return colonnes
 
 
 if __name__ == "__main__":
