@@ -25,6 +25,7 @@ def main():
     return main_gui()
 
 
+
 def cli():
 
     Columns = {}
@@ -33,7 +34,7 @@ def cli():
     taux_reussite_2008 = pd.read_csv("./fr-en-dnb-par-etablissement.csv", delimiter=";")
         
     # Récupération de l'input utilisateur
-    reponce = input("Que voulez vous avoir ? \n").split(": ")
+    reponce = input_user()
 
     # Vérification de l'input
     if not reponce or len(reponce) < 2:
@@ -43,16 +44,29 @@ def cli():
     # Recherche des colonnes et affichage
     colonnes_trouvees = rechercher_colonne(reponce)
     print("Colonnes trouvées:", colonnes_trouvees)
-    print("Arguments reçus:", reponce)
+    print("Le Tableau a liee est :", tableaux_liees(Columns, colonnes_trouvees))
 
 
-def rechercher_colonne(valeurs):
-        colonnes = []
-        for i in range(0, len(valeurs), 2):
-            if i < len(valeurs):
-                colonnes.append(valeurs[i])
-        return colonnes
+def rechercher_colonne(valeurs): # Fonction pour rechercher les colonnes
+    colonnes = []
+    for i in range(len(valeurs)):
+        colonnes.append(valeurs[i][0])
+    return colonnes
 
+# Fonction pour rechercher les tableaux en lien avec les colonnes
+def tableaux_liees(Columns, colonnes_trouvees):
+    Liste = []
+    for i in Columns:
+        if colonnes_trouvees in Columns[i]:
+            Liste.append(i)
+    return Liste
+
+# Fonction pour l'input utilisateur
+def input_user():
+    reponce = input("Que voulez vous avoir ? \n").split(", ")
+    reponce = [i.split(": ") for i in reponce]
+    print(reponce)
+    return reponce
 
 if __name__ == "__main__":
     main()
