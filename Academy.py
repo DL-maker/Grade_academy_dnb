@@ -28,10 +28,7 @@ def main():
 
 def cli():
 
-    Columns = {}
-    taux_reussite = pd.read_csv("./fr-en-indicateurs-valeur-ajoutee-colleges.csv", delimiter=";")
-    localisation_etablisement = pd.read_csv("./ips-all-geoloc.csv", delimiter=";")
-    taux_reussite_2008 = pd.read_csv("./fr-en-dnb-par-etablissement.csv", delimiter=";")
+    columns = recharge_des_bd()
         
     # Récupération de l'input utilisateur
     reponce = input_user()
@@ -44,8 +41,17 @@ def cli():
     # Recherche des colonnes et affichage
     colonnes_trouvees = rechercher_colonne(reponce)
     print("Colonnes trouvées:", colonnes_trouvees)
-    print("Le Tableau a liee est :", tableaux_liees(Columns, colonnes_trouvees))
+    print(tableaux_liees(columns, colonnes_trouvees))
 
+def recharge_des_bd():
+    check_out = {}
+    taux_reussite = pd.read_csv("./fr-en-indicateurs-valeur-ajoutee-colleges.csv", delimiter=";")
+    localisation_etablisement = pd.read_csv("./ips-all-geoloc.csv", delimiter=";")
+    taux_reussite_2008 = pd.read_csv("./fr-en-dnb-par-etablissement.csv", delimiter=";")
+    check_out["taux_reussite"] = list(taux_reussite.columns)
+    check_out["localisation_etablisement"] = list(localisation_etablisement.columns)
+    check_out["taux_reussite_2008"] = list(taux_reussite_2008.columns)
+    return check_out
 
 def rechercher_colonne(valeurs): # Fonction pour rechercher les colonnes
     colonnes = []
@@ -54,11 +60,12 @@ def rechercher_colonne(valeurs): # Fonction pour rechercher les colonnes
     return colonnes
 
 # Fonction pour rechercher les tableaux en lien avec les colonnes
-def tableaux_liees(Columns, colonnes_trouvees):
+def tableaux_liees(columns, colonnes_trouvees):
     Liste = []
-    for i in Columns:
-        if colonnes_trouvees in Columns[i]:
-            Liste.append(i)
+    for trouve in colonnes_trouvees:
+        for key, valeurs in columns.items():
+            if trouve in valeurs and key not in Liste:
+                Liste.append(key)
     return Liste
 
 # Fonction pour l'input utilisateur
