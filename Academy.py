@@ -40,9 +40,32 @@ def cli():
             
     # Recherche des colonnes et affichage
     colonnes_trouvees = rechercher_colonne(reponce)
-    print("Colonnes trouvées:", colonnes_trouvees)
-    print(tableaux_liees(columns, colonnes_trouvees))
+    valeur_trouvees = rechercher_valeur(reponce)
+    print("Colonnes trouvées:", colonnes_trouvees) # C bon
+    print("Valeur a trouvees:", valeur_trouvees)
+    lien = tableaux_liees(columns, colonnes_trouvees)
+    print(lien) # C bon
+    print(affichage(lien, colonnes_trouvees, valeur_trouvees))
 
+def affichage(lien, colonnes_trouvees, valeur_trouvees):
+    result = []
+    fichiers = {
+        'taux_reussite': './fr-en-indicateurs-valeur-ajoutee-colleges.csv',
+        'taux_reussite_2008': './fr-en-dnb-par-etablissement.csv',
+        'localisation_etablisement': './ips-all-geoloc.csv'
+    }
+    
+    for table in lien:
+        df = pd.read_csv(fichiers[table], delimiter=";")
+        for col, val in zip(colonnes_trouvees, valeur_trouvees): # Filtrage pour chaque colonne et valeur
+            if col in df.columns:
+                df = df[df[col].astype(str) == str(val)] # Conversion flexible du type
+        if not df.empty:
+            result.append(df)
+    return pd.concat(result)
+
+
+# charger les differents colonnes pour mettre a jour
 def recharge_des_bd():
     check_out = {}
     taux_reussite = pd.read_csv("./fr-en-indicateurs-valeur-ajoutee-colleges.csv", delimiter=";")
@@ -59,6 +82,12 @@ def rechercher_colonne(valeurs): # Fonction pour rechercher les colonnes
         colonnes.append(valeurs[i][0])
     return colonnes
 
+def rechercher_valeur(valeurs): # Fonction pour rechercher les colonnes
+    colonnes = []
+    for i in range(len(valeurs)):
+        colonnes.append(valeurs[i][1])
+    return colonnes
+
 # Fonction pour rechercher les tableaux en lien avec les colonnes
 def tableaux_liees(columns, colonnes_trouvees):
     Liste = []
@@ -72,7 +101,6 @@ def tableaux_liees(columns, colonnes_trouvees):
 def input_user():
     reponce = input("Que voulez vous avoir ? \n").split(", ")
     reponce = [i.split(": ") for i in reponce]
-    print(reponce)
     return reponce
 
 if __name__ == "__main__":
