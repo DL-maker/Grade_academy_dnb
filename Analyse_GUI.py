@@ -222,10 +222,10 @@ class DataAnalysisGUI:
             messagebox.showerror("Erreur", str(e))
             self.logger.error(f"Erreur lors de l'analyse : {e}")
 
-def main():
+def main_gui():
     root = tk.Tk()
     app = DataAnalysisGUI(root)
     root.mainloop()
 
 if __name__ == "__main__":
-    main()
+    main_gui()
