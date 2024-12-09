@@ -31,6 +31,9 @@ class DataAnalysisGUI:
         # Créer les widgets
         self.creer_widgets()
 
+        # Lier la fermeture de la fenêtre
+        self.master.protocol("WM_DELETE_WINDOW", self.fermer)
+
     def configurer_logging(self):
         """Configure la journalisation"""
         log_dir = os.path.join(os.getcwd(), 'logs')
@@ -230,10 +233,14 @@ class DataAnalysisGUI:
             messagebox.showerror("Erreur", str(e))
             self.logger.error(f"Erreur lors de l'analyse : {e}")
 
-def main_gui():
+    def fermer(self):
+        """Ferme l'application proprement"""
+        if self.connection_base:
+            self.connection_base.close()
+        self.master.quit()
+
+# Code principal pour l'exécution de l'interface graphique
+if __name__ == "__main__":
     root = tk.Tk()
     app = DataAnalysisGUI(root)
     root.mainloop()
-
-if __name__ == "__main__":
-    main_gui()
