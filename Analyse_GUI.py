@@ -23,6 +23,7 @@ class DataAnalysisGUI:
         self.repertoire = tk.StringVar(value=os.getcwd())
         self.fichiers_csv = []
         self.connection_base = None
+        self.afficher_toutes_les_lignes = tk.BooleanVar(value=False) # Variable pour la checkbox
 
         # Configuration du logging
         self.configurer_logging()
@@ -62,11 +63,13 @@ class DataAnalysisGUI:
         btn_parcourir = ttk.Button(repertoire_frame, text="Parcourir", command=self.choisir_repertoire)
         btn_parcourir.pack(side=tk.LEFT)
 
+        # Case à cocher pour afficher toutes les lignes et colonnes
+        self.check_afficher_toutes_les_lignes = ttk.Checkbutton(main_frame, text="Afficher toutes les lignes et colonnes", variable=self.afficher_toutes_les_lignes)
+        self.check_afficher_toutes_les_lignes.pack(pady=5)
+
         # Bouton de lancement de l'analyse
         btn_analyser = ttk.Button(main_frame, text="Lancer l'Analyse", command=self.lancer_analyse)
         btn_analyser.pack(pady=10)
-
-        
 
         # Frame pour les requêtes SQL
         sql_frame = ttk.Frame(main_frame)
@@ -79,11 +82,10 @@ class DataAnalysisGUI:
         btn_executer_sql = ttk.Button(sql_frame, text="Exécuter SQL", command=self.executer_requete_sql)
         btn_executer_sql.pack(side=tk.LEFT)
 
-
         # Notebook pour les résultats
         self.notebook = ttk.Notebook(main_frame)
         self.notebook.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
-        
+    
     def choisir_repertoire(self):
         """Ouvre un dialogue pour choisir le répertoire"""
         repertoire_choisi = filedialog.askdirectory()
@@ -147,8 +149,14 @@ class DataAnalysisGUI:
             # Exécuter la requête
             df_resultat = pd.read_sql_query(requete_sql, self.connection_base)
             
-            # Afficher les résultats
-            resultats_text.insert(tk.END, str(df_resultat))
+            # Vérifier si la case est cochée pour afficher toutes les lignes et colonnes
+            if self.afficher_toutes_les_lignes.get():
+                # Afficher toutes les lignes
+                resultats_text.insert(tk.END, df_resultat.to_string(index=False))
+            else:
+                # Afficher un échantillon (premières et dernières lignes)
+                resultats_text.insert(tk.END, f"Premières lignes:\n\n{str(df_resultat.head())}\n\n")
+                resultats_text.insert(tk.END, f"Dernières lignes:\n\n{str(df_resultat.tail())}")
             
             # Sélectionner le nouvel onglet
             self.notebook.select(frame_sql)
