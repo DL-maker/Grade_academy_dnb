@@ -1,9 +1,4 @@
-import os
 import pandas as pd
-import sqlite3
-import tkinter as tk
-from tkinter import filedialog, ttk, messagebox
-import customtkinter as ct
 import argparse
 from Analyse_GUI import main_gui
 
@@ -17,22 +12,28 @@ def main():
  \____/_|  \__,_|\__,_|\___| \_| |_/\___\__,_|\__,_|\___|_| |_| |_|\__, |  \__,_|_| |_|_.__/
                                                                     __/ |
                                                                    |___/  by Laith & Adel """)
-    parser = argparse.ArgumentParser(description="Academy") # On crée un parser pour les arguments
-    parser.add_argument( "--no-gui", help="Ne pas activer l'interface graphique", action="store_true") # On ajoute un argument pour le fichier CSV
-    args = parser.parse_args() # On parse les arguments
-    if args.no_gui: # Si l'argument est present on lance le mode CLI
-        return cli() 
+    parser = argparse.ArgumentParser(description="Academy")
+    parser.add_argument("--no-gui", help="Ne pas activer l'interface graphique", action="store_true")
+    parser.add_argument("--no-question", help="Ne pas poser de question", action="store_true")
+    parser.add_argument("--recherche", help="Recherche (format: 'col1:val1,col2:val2')", type=str)
+    
+    args = parser.parse_args()
+    
+    if args.no_gui:
+        return cli(args)
     return main_gui()
 
 
 
-def cli():
-
+def cli(args):
     columns = recharge_des_bd()
         
     # Récupération de l'input utilisateur
-    reponce = input_user()
-
+    reponce = []
+    if args.no_question and args.recherche:
+        reponce = parse_recherche(args.recherche)
+    else:
+        reponce = input_user()
     # Vérification de l'input
     if not reponce or len(reponce) < 2:
         print("Veuillez entrer un argument valide sous la forme 'colonne: valeur'")
@@ -144,6 +145,17 @@ def input_user():
     reponce = [i.split(": ") for i in reponce]
     return [[item[0], item[1]] for item in reponce if len(item) == 2] # On retourne une liste de liste pour but de faciliter la recherche des colonnes et valeurs
 
+def parse_recherche(recherche):
+    pairs = recherche.split(", ")
+    reponce = []
+    for pair in pairs:
+        if ": " in pair:
+            key, value = pair.split(": ", 1)
+            reponce.append([key.strip(), value.strip()]) # On retourne une liste de liste pour but de faciliter la recherche des colonnes et valeurs 
+        else:
+            print(f"Erreur de format pour {pair}. Format attendu: 'clé: valeur'")
+            return []
+    return reponce
 
 if __name__ == "__main__":
     main()
