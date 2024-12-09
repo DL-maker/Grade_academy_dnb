@@ -44,10 +44,20 @@ def cli():
     print("Colonnes trouvées:", colonnes_trouvees) # C bon
     print("Valeur a trouvees:", valeur_trouvees)
     lien = tableaux_liees(columns, colonnes_trouvees)
+    affiche = select(reponce) 
     print(lien) # C bon
-    print(affichage(lien, colonnes_trouvees, valeur_trouvees))
+    print(affiche) 
+    print(affichage(lien, colonnes_trouvees, valeur_trouvees, affiche))
 
-def affichage(lien, colonnes_trouvees, valeur_trouvees):
+def select(donner): 
+    print("Debug select - Donner:", donner)
+    for item in donner:
+        print("Debug select - Item:", item)
+        if item[0] == "Specifiques":
+            return item[1].strip()
+    return None
+
+def affichage(lien, colonnes_trouvees, valeur_trouvees, affiche):
     result = []
     fichiers = {
         'taux_reussite': './fr-en-indicateurs-valeur-ajoutee-colleges.csv',
@@ -56,13 +66,34 @@ def affichage(lien, colonnes_trouvees, valeur_trouvees):
     }
     
     for table in lien:
-        df = pd.read_csv(fichiers[table], delimiter=";")
-        for col, val in zip(colonnes_trouvees, valeur_trouvees): # Filtrage pour chaque colonne et valeur
-            if col in df.columns:
-                df = df[df[col].astype(str) == str(val)] # Conversion flexible du type
-        if not df.empty:
-            result.append(df)
-    return pd.concat(result)
+        try:
+            # Charger le fichier CSV
+            df = pd.read_csv(fichiers[table], delimiter=";")
+        except Exception as e:
+            print(f"Erreur de lecture du fichier {fichiers[table]} : {e}")
+            continue
+
+        # Filtrage des lignes sur la base des colonnes et valeurs trouvées
+        filtered_df = df.copy()
+        for col, val in zip(colonnes_trouvees, valeur_trouvees):
+            if col in filtered_df.columns:
+                filtered_df = filtered_df[filtered_df[col].astype(str) == str(val)]
+            else:
+                print(f"Colonne '{col}' introuvable dans {table}. Colonnes disponibles : {list(filtered_df.columns)}")
+
+        # selectionne la colonne spécifique demandée
+        if not filtered_df.empty:
+            if affiche:  # gestion des cas "Specifiques"
+                if affiche in filtered_df.columns:
+                    filtered_df = filtered_df[[affiche]]
+                else:
+                    print(f"La colonne '{affiche}' demandée n'existe pas dans {table}.")
+            result.append(filtered_df)
+
+    # Combine les résultats des différents fichiers
+    return pd.concat(result, ignore_index=True).drop_duplicates() if result else pd.DataFrame()
+
+
 
 
 # charger les differents colonnes pour mettre a jour
@@ -76,16 +107,25 @@ def recharge_des_bd():
     check_out["taux_reussite_2008"] = list(taux_reussite_2008.columns)
     return check_out
 
+# Fonction pour prendre en compte afficher un colonnes 
+def select(donner):
+    for item in donner:
+        if item[0] == "Specifiques":
+            return item[1]
+    return None
+
 def rechercher_colonne(valeurs): # Fonction pour rechercher les colonnes
     colonnes = []
     for i in range(len(valeurs)):
-        colonnes.append(valeurs[i][0])
+        if valeurs[i] != "Specifiques" :
+            colonnes.append(valeurs[i][0])
     return colonnes
 
-def rechercher_valeur(valeurs): # Fonction pour rechercher les colonnes
+def rechercher_valeur(valeurs): # Fonction pour rechercher le valeur qui seront en commien 
     colonnes = []
     for i in range(len(valeurs)):
-        colonnes.append(valeurs[i][1])
+        if valeurs[i] != "Specifiques" :
+            colonnes.append(valeurs[i][1])
     return colonnes
 
 # Fonction pour rechercher les tableaux en lien avec les colonnes
@@ -93,15 +133,17 @@ def tableaux_liees(columns, colonnes_trouvees):
     Liste = []
     for trouve in colonnes_trouvees:
         for key, valeurs in columns.items():
-            if trouve in valeurs and key not in Liste:
-                Liste.append(key)
+            if key != "Specifiques":
+                if trouve in valeurs and key not in Liste:
+                    Liste.append(key)
     return Liste
 
 # Fonction pour l'input utilisateur
 def input_user():
-    reponce = input("Que voulez vous avoir ? \n").split(", ")
+    reponce = input("Que voulez-vous avoir ? \n").split(", ")
     reponce = [i.split(": ") for i in reponce]
-    return reponce
+    return [[item[0], item[1]] for item in reponce if len(item) == 2] # On retourne une liste de liste pour but de faciliter la recherche des colonnes et valeurs
+
 
 if __name__ == "__main__":
     main()
