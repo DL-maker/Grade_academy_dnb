@@ -240,7 +240,11 @@ class DataAnalysisGUI:
         self.master.quit()
 
 # Code principal pour l'exécution de l'interface graphique
-if __name__ == "__main__":
+def main_gui():
+    import tkinter as tk
     root = tk.Tk()
     app = DataAnalysisGUI(root)
     root.mainloop()
+
+if __name__ == "__main__":
+    main_gui()
