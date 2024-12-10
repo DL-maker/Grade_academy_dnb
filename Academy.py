@@ -35,7 +35,7 @@ def cli(args):
     else:
         reponce = input_user()
     # Vérification de l'input
-    if not reponce or len(reponce) < 2:
+    if not reponce:
         print("Veuillez entrer un argument valide sous la forme 'colonne: valeur'")
         return
             
