@@ -33,7 +33,7 @@ GrandAnalyser est une application Python permettant l'analyse de fichiers CSV av
 
 1. Cloner le dépôt
 ```bash
-git clone https://github.com/votre-utilisateur/GrandAnalyser.git
+git clone https://github.com/DL-maker/Grade_academy_dnb.git
 cd GrandAnalyser
 ```
 
