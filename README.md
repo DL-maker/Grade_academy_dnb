@@ -52,10 +52,10 @@ python Analyse_GUI.py
 ### Utilisation en Ligne de Commande
 ```bash
 # Lancement sans GUI
-python main.py --no-gui
+python Academy.py --no-gui
 
 # Recherche spécifique
-python main.py --recherche "colonne1: valeur1, colonne2: valeur2"
+python Academy.py --recherche "colonne1: valeur1, colonne2: valeur2"
 ```
 
 ## 📝 Options de Ligne de Commande
