@@ -67,7 +67,7 @@ python Academy.py --recherche "colonne1: valeur1, colonne2: valeur2"
 ## 🗂️ Structure des Fichiers
 
 - `Analyse_GUI.py`: Interface graphique principale
-- `main.py`: Point d'entrée du programme
+- `Academy.py`: Point d'entrée du programme
 - `*.csv`: Fichiers de données source
 
 ## 🔍 Exemple de Recherche
