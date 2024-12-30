@@ -83,6 +83,9 @@ L'application inclut une gestion robuste des erreurs avec :
 - Messages d'erreur explicites
 - Gestion des fichiers CSV mal formatés
 
+## 📃License
+Protected by an MIT license
+
 ## 👥 Auteurs
 
 - Laith
